@@ -36,14 +36,17 @@ class PostService {
 
     async getFeedPosts(userId){
         const currentUser = await User.findById(userId);
-        const userPosts = await Post.find({userId}).populate(["user",'likes']);
+        console.log(userId)
+        const userPosts = await Post.find({user : userId}).populate(["user",'likes']);
         const friendPosts = await Promise.all(
             currentUser.followers.map(friendId => {
-                Post.find({userId: friendId}).populate(["user",'likes'])
+                Post.find({user: friendId}).populate(["user",'likes'])
             })
         )
         // return userPosts.concat(friendPosts)
-        return [...userPosts,...friendPosts]
+        const res = [...userPosts,...friendPosts]
+        console.log(res)
+        return res
     }
 
     async getUserPosts(userId){

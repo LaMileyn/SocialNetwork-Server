@@ -48,14 +48,16 @@ class PostController {
         }
     }
 
+
     async getFeedPosts(req, res, next) {
         try {
-            const posts = await postService.getFeedPosts(req.params.userId);
+            const posts = await postService.getFeedPosts(req.user.id);
             res.status(200).json(posts)
         } catch (err) {
             next(err)
         }
     }
+
 
     async getUserPosts(req, res, next) {
         try {

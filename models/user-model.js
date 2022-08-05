@@ -12,18 +12,12 @@ const UserSchema = new mongoose.Schema({
     followers: [
         {type: mongoose.Schema.Types.ObjectId, ref : "User"}
     ],
-    // subscribers : [
-    //     {type: mongoose.Schema.Types.ObjectId, ref : "User"}
-    // ],
     followersRequests : [
         {type: mongoose.Schema.Types.ObjectId, ref : "User"}
     ],
     followingRequests : [
         {type: mongoose.Schema.Types.ObjectId, ref : "User"}
     ],
-    // subscribedTo : [
-    //     {type: mongoose.Schema.Types.ObjectId, ref : "User"}
-    // ],
     isAdmin: {type: Boolean, default: false},
     desc: {type: String, max: 50},
     meta : {
