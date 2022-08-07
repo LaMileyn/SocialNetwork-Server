@@ -15,9 +15,7 @@ const ConversationSchema = new Schema({
     type: {
         type: String
     },
-    messages : [
-        { type : Schema.Types.ObjectId, ref : "Message"}
-    ]
+    lastMessage : { type : Schema.Types.ObjectId, ref : "Message"}
 }, {timestamps: true})
 
 module.exports = model("Conversation", ConversationSchema)

@@ -88,7 +88,13 @@ class UserService {
         if (data.password) {
             data.password = await bcrypt.hash(data.password, 6);
         }
-        await User.findOneAndUpdate({userId}, {$set: data})
+        await User.findOneAndUpdate({_id: userId}, {$set: data})
+    }
+
+    async incrementNotification(userId, field) {
+        await User.findOneAndUpdate({_id: userId},{
+
+        })
     }
 
     async deleteUser(userId) {
@@ -123,7 +129,7 @@ class UserService {
             await currentUser.updateOne({$push: {followers: requestUserId}, $pull: {followersRequests: requestUserId}});
             // deals with requested user
 
-            await requestUser.updateOne({$pull: {followingRequests: currentUserId},$push: {followers: currentUserId} });
+            await requestUser.updateOne({$pull: {followingRequests: currentUserId}, $push: {followers: currentUserId}});
         } else {
             throw ApiError.BadRequest("User already is your friend")
         }
@@ -165,12 +171,13 @@ class UserService {
         return user.followers;
     }
 
-    async cancelFollowRequest(followSenderId,followReceiverId){
+    async cancelFollowRequest(followSenderId, followReceiverId) {
         const followSender = await User.findById(followSenderId);
         const followReceiver = await User.findById(followReceiverId);
 
-        await followSender.updateOne({ $pull : { followingRequests : followReceiverId}})
-        await followReceiver.updateOne({ $pull : { followersRequests : followSenderId}})
+        await followSender.updateOne({$pull: {followingRequests: followReceiverId}})
+        await followReceiver.updateOne({$pull: {followersRequests: followSenderId}})
     }
 }
+
 module.exports = new UserService();

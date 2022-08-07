@@ -1,9 +1,11 @@
+
+
+
 const io = require("socket.io")(8900, {
     cors: {
         origin: "http://localhost:3000"
     }
 })
-
 let users = [];
 const addNewUser = (userId, socketId) => !users.some(user => user.userId === userId) && users.push({userId, socketId})
 const removeUser = (socketId) => {
@@ -16,22 +18,49 @@ const getUser = (userId) => {
     return res
 }
 io.on("connection", (socket) => {
-    // we take userId and socketId from user
     socket.on("addUser", (userId) => {
+        // main list of users
         addNewUser(userId, socket.id)
+        // creating special room for a user
+        socket.join(userId)
+        console.log("user joined: " + userId)
         io.emit("getUsers", users)
     })
 
+    socket.on("typing", async (room,userId) => {
+        // console.log("USER ID : " + userId)
+        // const user = await User.findById(userId);
+        //
+        // console.log(user)
+        socket.in(room).emit("typing",userId)
+    })
+    socket.on("stop-typing", (room,userId) => socket.in(room).emit("stop-typing",userId))
 
-    //user leaving
+    socket.on("join-room", async (room) =>{
+        // room equals to conversation._id //
+        socket.join(room);
+    })
+    socket.on("message-room",(data) =>{
+        const roomUsers = data.conversation.members;
+        roomUsers.forEach( roomUser => {
+            if( roomUser._id === data.sender.id) return;
+            socket.in(roomUser._id).emit("room-messages",data)
+        })
+    });
+
     socket.on("disconnect", () => {
         removeUser(socket.id)
         io.emit("getUsers", users)
     })
-    //send message
-    socket.on("sendMessage", (data) => {
-        const currUsers = data.to.map(user => getUser(user));
-        const {to, ...other} = data;
-        currUsers.forEach(user => user && io.to(user.socketId).emit("getMessage", other))
-    })
+
+    // socket.on("invite-to-room", async (room,myId,userId) =>{
+    //     let currentConversation = await conversationService.getOneConversation(room);
+    //     const user = getUser(userId)
+    //     user && io.to(user.socketId).emit("send-invite-to-room",currentConversation);
+    //     socket.broadcast.emit("new-room-member", {
+    //         invitor : myId,
+    //         invitedPerson : userId,
+    //     });
+    // })
+
 })

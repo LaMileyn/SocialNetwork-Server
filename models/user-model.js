@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+const {Schema} = require("mongoose");
 
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
     username: {type: String, required: true},
     email: {type: String, required: true, max: 50, unique: true},
     password: {type: String, required: true, min: 6},
@@ -20,6 +21,14 @@ const UserSchema = new mongoose.Schema({
     ],
     isAdmin: {type: Boolean, default: false},
     desc: {type: String, max: 50},
+    notifications : {
+        conversations : [
+            { type : Schema.Types.ObjectId, ref : "Conversation", newMessages : { type : Number }}
+        ],
+        friendRequests : [
+            { type : Schema.Types.ObjectId, ref : "User"}
+        ]
+    },
     meta : {
         interests : {
             activity : { type : String },

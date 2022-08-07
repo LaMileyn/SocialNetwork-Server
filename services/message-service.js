@@ -7,7 +7,7 @@ class MessageService {
             ...message,
             sender : message.sender._id
         });
-        await conversationService.addNewMessage(message.conversation,newMess._id)
+        await conversationService.updateLastMessage(message.conversation,newMess._id)
         return newMess;
     }
 
@@ -17,12 +17,14 @@ class MessageService {
     }
 
     async deleteMessage(messageId) {
-        const message = await Message.findById(messageId)
-        await conversationService.removeMessage(message.conversation,messageId)
+        const message = await Message.findById(messageId);
+        // here we should in conversation last message back to  previous message
         await Message.deleteOne({_id: messageId});
     }
 
     async updateMessage(newData, messageId) {
+        const message = await Message.findById(messageId)
+        await conversationService.updateLastMessage(message.conversation,messageId)
         await Message.updateOne({_id: messageId}, newData);
     }
 }

@@ -13,15 +13,12 @@ class ConversationService {
     }
 
     async getConversationWithUser(userId, myId) {
-        const conversations = await Conversation.find({$and: [{members: {$in: [userId]}}, {members: {$in: [myId]}}, { members: { $size : 2}}]}).populate("members")
+        const conversations = await Conversation.find({$and: [{members: {$in: [userId]}}, {members: {$in: [myId]}}, {members: {$size: 2}}]}).populate("members")
         return conversations
     }
 
-    async addNewMessage(conversationId,messageId){
-        await Conversation.updateOne({ _id : conversationId}, { $push : { messages : messageId}})
-    }
-    async removeMessage(conversationId,messageId){
-        await Conversation.updateOne({ _id : conversationId}, { $pull : { messages : messageId}})
+    async updateLastMessage(conversationId, messageId) {
+        await Conversation.updateOne({_id: conversationId}, {$set: {lastMessage: messageId}})
     }
 }
 
