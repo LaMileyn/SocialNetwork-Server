@@ -19,16 +19,16 @@ class MessageController {
         }
     }
 
-    async deleteMessage(req, res, next) {
+    async deleteMessages(req, res, next) {
         try {
-            await messageService.deleteMessage(req.params.id);
+            await messageService.deleteMessages(req.body);
             return res.status(200).json("Deleted")
         } catch (err) {
             next(err);
         }
     }
 
-    async updateMessage(req,res,next){
+    async updateMessages(req,res,next){
         try {
             const updatedData = await messageService.updateMessage(req.body,req.params.id);
             return res.status(200).json("Updated");

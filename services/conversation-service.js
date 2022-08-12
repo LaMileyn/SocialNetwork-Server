@@ -8,13 +8,25 @@ class ConversationService {
     }
 
     async getUserConversations(userId) {
-        const conversations = await Conversation.find({members: {$in: [userId]}}).populate("members");
+        const conversations = await Conversation.find({members: {$in: [userId]}})
+            .populate("members")
+            .populate({
+                path : "lastMessage",
+                populate : {
+                    path : "sender"
+                }
+            });
         return conversations;
     }
 
     async getConversationWithUser(userId, myId) {
         const conversations = await Conversation.find({$and: [{members: {$in: [userId]}}, {members: {$in: [myId]}}, {members: {$size: 2}}]}).populate("members")
         return conversations
+    }
+
+    async getConversationUsers(coversationId){
+        const users = await Conversation.findById(coversationId).populate("members")
+        return users;
     }
 
     async updateLastMessage(conversationId, messageId) {

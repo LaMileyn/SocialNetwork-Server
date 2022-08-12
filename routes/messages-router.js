@@ -5,9 +5,9 @@ const messageController = require("./../controllers/message-controller")
 // message create
 router.post("/", authMiddleware, messageController.createMessage);
 // message update
-router.put("/:id", authMiddleware, messageController.updateMessage);
+router.put("/:id", authMiddleware, messageController.updateMessages);
 //message delete
-router.delete("/:id", authMiddleware, messageController.deleteMessage);
+router.delete("/", authMiddleware, messageController.deleteMessages);
 // get messages
 router.get("/:conversationId", authMiddleware, messageController.getMessages)
 

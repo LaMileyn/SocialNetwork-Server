@@ -92,9 +92,7 @@ class UserService {
     }
 
     async incrementNotification(userId, field) {
-        await User.findOneAndUpdate({_id: userId},{
-
-        })
+        await User.findOneAndUpdate({_id: userId}, {})
     }
 
     async deleteUser(userId) {
@@ -139,20 +137,14 @@ class UserService {
         const currentUser = await User.findById(currentUserId);
         const requestUser = await User.findById(requestUserId);
 
-        if (!currentUser.subscribers.includes(requestUserId)) {
-            // deals with current user
-            await currentUser.updateOne({
-                $push: {subscribers: requestUserId},
-                $pull: {followersRequests: requestUserId}
-            });
-            // deals with requested user
-            await requestUser.updateOne({
-                $pull: {followingRequests: currentUserId},
-                $push: {subscribedTo: currentUserId}
-            });
-        } else {
-            throw ApiError.BadRequest("He is already your subscriber")
-        }
+        // deals with current user
+        await currentUser.updateOne({
+            $push: {subscribers: requestUserId}
+        });
+        // deals with requested user
+        await requestUser.updateOne({
+            $pull: {followingRequests: currentUserId}
+        });
     }
 
     async unFollowUser(userToFollowId, currentUserId) {
@@ -178,6 +170,32 @@ class UserService {
         await followSender.updateOne({$pull: {followingRequests: followReceiverId}})
         await followReceiver.updateOne({$pull: {followersRequests: followSenderId}})
     }
+
+    async allUsers(query, userId) {
+        const keyword = query.search
+            ? {
+                $or: [
+                    {username: {$regex: query.search, $options: "i"}},
+                    {email: {$regex: query.search, $options: "i"}}
+                ]
+            }
+            : {}
+        const users = await User
+            .find(keyword)
+            .find({_id: {$ne: userId}})
+            .find({$and : [{ followers : { $nin : [userId]}},{ followersRequests : { $nin : [userId]}},{ followingRequests : { $nin : [userId]}}]})
+        return users
+    }
+
+    async getUserFollowersRequest(userId){
+        const users = await User.find({ followingRequests : { $in : [userId]} });
+        return users;
+    }
+    async getUserFollowingRequest(userId){
+        const users = await User.find({ followersRequests : { $in : [userId]} });
+        return users;
+    }
+
 }
 
 module.exports = new UserService();

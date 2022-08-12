@@ -138,6 +138,32 @@ class UserController {
         }
     }
 
+    async allUsers(req,res,next){
+        try {
+            const users = await userService.allUsers(req.query,req.user.id)
+            res.status(200).json(users)
+        }catch (err){
+            next(err);
+        }
+    }
+
+    async getUserFollowersRequest(req,res,next){
+        try {
+            const users = await userService.getUserFollowersRequest(req.user.id)
+            return res.status(200).json(users)
+        }catch (err){
+            next(err)
+        }
+    }
+    async getUserFollowingRequest(req,res,next){
+        try {
+            const users = await userService.getUserFollowingRequest(req.user.id)
+            return res.status(200).json(users)
+        }catch (err){
+            next(err)
+        }
+    }
+
 
 }
 

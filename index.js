@@ -17,10 +17,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
-app.use("/images", express.static(path.join(__dirname, "public/images")))
+app.use('/api',router)
+app.use("/api/images", express.static(path.join(__dirname, "public/images")))
 app.use(helmet())
 app.use(morgan("common"))
-app.use('/api',router)
 app.use(errorMiddleWare)
 
 const storage = multer.diskStorage({

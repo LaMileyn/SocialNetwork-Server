@@ -3,12 +3,12 @@ module.exports = class UserDto {
     id;
     isActivated;
     username;
-    avatar;
+    profilePicture;
     constructor(model) { // only properties that we need
         this.email = model.email
         this.id = model._id
         this.isActivated = model.activated
         this.username = model.username
-        this.avatar = model.profilePicture
+        this.profilePicture = model.profilePicture
     }
 }
