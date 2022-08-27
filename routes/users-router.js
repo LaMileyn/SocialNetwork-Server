@@ -6,11 +6,11 @@ const authMiddleware = require('./../middlewares/auth-middleware');
 
 
 //get all users
-router.get("/",authMiddleware,userController.allUsers)
+// router.get("/",authMiddleware,userController.allUsers)
 //refresh
 router.get("/refresh", userController.toRefresh)
 //update user
-router.put("/:id", authMiddleware, userController.update)
+router.put("/", authMiddleware, userController.update)
 //delete user
 router.delete("/:id", authMiddleware, userController.delete)
 //get a user
@@ -39,6 +39,8 @@ router.get("/friends/followersRequests",authMiddleware, userController.getUserFo
 router.get("/friends/followingRequests",authMiddleware, userController.getUserFollowingRequest)
 //get friends
 router.get("/friends/:id",authMiddleware, userController.getUserFriends)
+// get all users / friends with requests
+router.get("/all/:id",authMiddleware,userController.allUsers)
 
 
 module.exports = router;

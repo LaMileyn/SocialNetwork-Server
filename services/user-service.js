@@ -101,6 +101,7 @@ class UserService {
 
     async getOneUser(userId) {
         const user = await User.findById(userId);
+        if (!user) throw ApiError.BadRequest("User does not exit")
         return user;
     }
 
@@ -172,6 +173,7 @@ class UserService {
     }
 
     async allUsers(query, userId) {
+        const isFriends = query.isFriends;
         const keyword = query.search
             ? {
                 $or: [
@@ -180,19 +182,56 @@ class UserService {
                 ]
             }
             : {}
-        const users = await User
-            .find(keyword)
-            .find({_id: {$ne: userId}})
-            .find({$and : [{ followers : { $nin : [userId]}},{ followersRequests : { $nin : [userId]}},{ followingRequests : { $nin : [userId]}}]})
+        let users;
+        if (isFriends) {
+            users = await User
+                .find(keyword)
+                .find({_id: {$ne: userId}})
+                .find(
+                    {
+                        $or: [
+                            {
+                                followers: {$in: [userId]}
+                            },
+                            {
+                                followersRequests: {$in: [userId]}
+                            },
+                            {
+                                followingRequests: {$in: [userId]}
+                            },
+                        ]
+                    }
+                )
+        } else {
+            users = await User
+                .find(keyword)
+                .find({_id: {$ne: userId}})
+                .find(
+                    {
+                        $and: [
+                            {
+                                followers: {$nin: [userId]}
+                            },
+                            {
+                                followersRequests: {$nin: [userId]}
+                            },
+                            {
+                                followingRequests: {$nin: [userId]}
+                            }
+                        ]
+                    }
+                )
+        }
         return users
     }
 
-    async getUserFollowersRequest(userId){
-        const users = await User.find({ followingRequests : { $in : [userId]} });
+    async getUserFollowersRequest(userId) {
+        const users = await User.find({followingRequests: {$in: [userId]}});
         return users;
     }
-    async getUserFollowingRequest(userId){
-        const users = await User.find({ followersRequests : { $in : [userId]} });
+
+    async getUserFollowingRequest(userId) {
+        const users = await User.find({followersRequests: {$in: [userId]}});
         return users;
     }
 

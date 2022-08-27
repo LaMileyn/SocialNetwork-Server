@@ -4,7 +4,8 @@ const User = require("../models/user-model");
 class PostService {
     async createPost(postData) {
         const newPost = await Post.create(postData);
-        return newPost;
+        const response = await Post.findById(newPost._id).populate(["user", "likes"])
+        return response;
     }
 
     async updatePost(postData, postId) {
@@ -30,27 +31,26 @@ class PostService {
         }
     }
 
-    async deletePost(postId){
+    async deletePost(postId) {
         await Post.deleteOne({_id: postId});
     }
 
-    async getFeedPosts(userId){
+    async getFeedPosts(userId) {
         const currentUser = await User.findById(userId);
-        console.log(userId)
-        const userPosts = await Post.find({user : userId}).populate(["user",'likes']);
-        const friendPosts = await Promise.all(
-            currentUser.followers.map(friendId => {
-                Post.find({user: friendId}).populate(["user",'likes'])
-            })
-        )
-        // return userPosts.concat(friendPosts)
-        const res = [...userPosts,...friendPosts]
-        console.log(res)
-        return res
+        const posts = await Post.find({
+            $or: [
+                {user: userId},
+                {user: {$in: currentUser.followers}}
+            ]
+        }).populate(["user", 'likes']).sort({createdAt: -1})
+        return posts
     }
 
-    async getUserPosts(userId){
-        const posts = await Post.find({user : userId}).populate(["user",'likes']);
+    async getUserPosts(userId) {
+        const posts = await Post
+            .find({user: userId})
+            .sort({createdAt: -1})
+            .populate(["user", 'likes']);
         return posts;
     }
 }

@@ -5,6 +5,16 @@ const {Schema} = require("mongoose");
 const UserSchema = new Schema({
     username: {type: String, required: true},
     email: {type: String, required: true, max: 50, unique: true},
+    age : { type: Number },
+    status : { type : String},
+    location : {
+        city : {
+            type : String,
+        },
+        country : {
+            type : String
+        }
+    },
     password: {type: String, required: true, min: 6},
     activated: {type: Boolean, default: false},
     activationLink: {type: String},
@@ -21,30 +31,30 @@ const UserSchema = new Schema({
     ],
     isAdmin: {type: Boolean, default: false},
     desc: {type: String, max: 50},
-    notifications : {
-        conversations : [
-            { type : Schema.Types.ObjectId, ref : "Conversation", newMessages : { type : Number }}
-        ],
-        friendRequests : [
-            { type : Schema.Types.ObjectId, ref : "User"}
-        ]
-    },
-    meta : {
-        interests : {
-            activity : { type : String },
-            personInterests : { type : String },
-            belovedMusic : { type : String },
-            belovedFilms : { type : String },
-            belovedShows : { type : String },
-            belovedBooks : { type : String },
-            belovedGames : { type : String },
-            aboutSelf : { type : String },
-        },
-        contacts : {
-            mobileNumber : { type : String }
-        }
-
-    },
+    // notifications : {
+    //     conversations : [
+    //         { type : Schema.Types.ObjectId, ref : "Conversation", newMessages : { type : Number }}
+    //     ],
+    //     friendRequests : [
+    //         { type : Schema.Types.ObjectId, ref : "User"}
+    //     ]
+    // },
+    // meta : {
+    //     interests : {
+    //         activity : { type : String },
+    //         personInterests : { type : String },
+    //         belovedMusic : { type : String },
+    //         belovedFilms : { type : String },
+    //         belovedShows : { type : String },
+    //         belovedBooks : { type : String },
+    //         belovedGames : { type : String },
+    //         aboutSelf : { type : String },
+    //     },
+    //     contacts : {
+    //         mobileNumber : { type : String }
+    //     }
+    //
+    // },
 }, {timestamps: true})
 
 

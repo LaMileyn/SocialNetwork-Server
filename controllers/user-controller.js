@@ -59,7 +59,7 @@ class UserController {
 
     async update(req, res, next) {
         try {
-            await userService.updateUser(req.body, req.params.id);
+            await userService.updateUser(req.body, req.user.id);
             return res.status(200).json("User updated")
         } catch (err) {
             next(err)
@@ -140,7 +140,7 @@ class UserController {
 
     async allUsers(req,res,next){
         try {
-            const users = await userService.allUsers(req.query,req.user.id)
+            const users = await userService.allUsers(req.query,req.params.id)
             res.status(200).json(users)
         }catch (err){
             next(err);

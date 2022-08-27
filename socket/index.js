@@ -67,6 +67,13 @@ module.exports = function initialyseSocket(io) {
                 socket.in(roomUser._id).emit("room-message-update", data)
             })
         })
+        socket.on("message-delete",(data) =>{
+            const roomUsers = data.conversation.members;
+            roomUsers.forEach(roomUser => {
+                if (roomUser._id === data.sender.id) return;
+                socket.in(roomUser._id).emit("room-message-delete", data)
+            })
+        })
 
         socket.on("disconnect", () => {
             removeUser(socket.id)
