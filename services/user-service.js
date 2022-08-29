@@ -88,7 +88,8 @@ class UserService {
         if (data.password) {
             data.password = await bcrypt.hash(data.password, 6);
         }
-        await User.findOneAndUpdate({_id: userId}, {$set: data})
+        const updatedUser = await User.findOneAndUpdate({_id: userId}, {$set: data}, { new : true})
+        return updatedUser
     }
 
     async incrementNotification(userId, field) {

@@ -20,6 +20,9 @@ const UserSchema = new Schema({
     activationLink: {type: String},
     profilePicture: {type: String, default: ""},
     coverPicture: {type: String, default: ""},
+    posts : [
+        { type : Schema.Types.ObjectId, ref : "Post"}
+    ],
     followers: [
         {type: mongoose.Schema.Types.ObjectId, ref : "User"}
     ],

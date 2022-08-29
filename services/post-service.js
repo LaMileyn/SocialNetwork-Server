@@ -4,7 +4,8 @@ const User = require("../models/user-model");
 class PostService {
     async createPost(postData) {
         const newPost = await Post.create(postData);
-        const response = await Post.findById(newPost._id).populate(["user", "likes"])
+        await User.updateOne({ _id : newPost.user}, { $push : { posts: newPost }} )
+        const response = await Post.findById(newPost._id).populate(["user"])
         return response;
     }
 
@@ -32,6 +33,7 @@ class PostService {
     }
 
     async deletePost(postId) {
+        await User.updateOne({ posts : { $in : postId }}, { $pull : { posts: postId}})
         await Post.deleteOne({_id: postId});
     }
 
@@ -42,7 +44,7 @@ class PostService {
                 {user: userId},
                 {user: {$in: currentUser.followers}}
             ]
-        }).populate(["user", 'likes']).sort({createdAt: -1})
+        }).populate(["user"]).sort({createdAt: -1})
         return posts
     }
 
@@ -50,7 +52,7 @@ class PostService {
         const posts = await Post
             .find({user: userId})
             .sort({createdAt: -1})
-            .populate(["user", 'likes']);
+            .populate(["user"]);
         return posts;
     }
 }

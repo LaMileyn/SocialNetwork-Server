@@ -8,6 +8,7 @@ const PostSchema = new Schema({
     likes : [
         { type : Schema.Types.ObjectId, ref : "User" }
     ],
+    isFixed : { type : Boolean, default: false},
     views : { type : Number, default : 0}
 }, { timestamps : true })
 
