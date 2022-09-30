@@ -56,21 +56,22 @@ module.exports = function initialyseSocket(io) {
         socket.on("message-room", (data) => {
             const roomUsers = data.conversation.members;
             roomUsers.forEach(roomUser => {
-                if (roomUser._id === data.sender.id) return;
+                if (roomUser._id === data.sender._id) return;
                 socket.in(roomUser._id).emit("room-messages", data)
             })
-        });
+        })
         socket.on("message-update",(data) =>{
+            console.log(data)
             const roomUsers = data.conversation.members;
             roomUsers.forEach(roomUser => {
-                if (roomUser._id === data.sender.id) return;
+                if (roomUser._id === data.sender._id) return;
                 socket.in(roomUser._id).emit("room-message-update", data)
             })
         })
         socket.on("message-delete",(data) =>{
             const roomUsers = data.conversation.members;
             roomUsers.forEach(roomUser => {
-                if (roomUser._id === data.sender.id) return;
+                if (roomUser._id === data.sender._id) return;
                 socket.in(roomUser._id).emit("room-message-delete", data)
             })
         })

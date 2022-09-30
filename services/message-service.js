@@ -9,6 +9,12 @@ class MessageService {
         });
         await conversationService.updateLastMessage(message.conversation,newMess._id)
         const resultMessage = await Message.findById(newMess._id).populate("sender")
+            .populate({
+            path : "conversation",
+            populate : {
+                path : "members"
+            }
+        });
         return resultMessage;
     }
 
@@ -28,7 +34,9 @@ class MessageService {
     async updateMessage(newData, messageId) {
         const message = await Message.findById(messageId)
         await conversationService.updateLastMessage(message.conversation,messageId)
-        await Message.updateOne({_id: messageId}, newData);
+        const newMessage = await Message.findOneAndUpdate({_id: messageId}, newData, { new : true })
+            .populate("conversation").populate("sender");
+        return newMessage
     }
 }
 

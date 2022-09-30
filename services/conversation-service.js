@@ -11,20 +11,23 @@ class ConversationService {
         const conversations = await Conversation.find({members: {$in: [userId]}})
             .populate("members")
             .populate({
-                path : "lastMessage",
-                populate : {
-                    path : "sender"
+                path: "lastMessage",
+                populate: {
+                    path: "sender"
                 }
             });
         return conversations;
     }
 
     async getConversationWithUser(userId, myId) {
-        const conversations = await Conversation.find({$and: [{members: {$in: [userId]}}, {members: {$in: [myId]}}, {members: {$size: 2}}]}).populate("members")
-        return conversations
+        const conversation = await Conversation
+            .findOne({$and: [{members: {$in: [userId]}}, {members: {$in: [myId]}}, {members: {$size: 2}}]})
+            .findOne({isGroupChat : { $eq : false }})
+            .populate("members")
+        return conversation
     }
 
-    async getConversationUsers(coversationId){
+    async getConversationUsers(coversationId) {
         const users = await Conversation.findById(coversationId).populate("members")
         return users;
     }

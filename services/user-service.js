@@ -14,7 +14,7 @@ class UserService {
         const tokens = tokenService.generateTokens({...userDto}) // generating tokens for user
         await tokenService.saveToken(userDto.id, tokens.refreshToken) // saving refresh token for user
         return {
-            ...tokens, userInfo: userDto
+            ...tokens, userInfo: user
         }
     }
 
@@ -44,6 +44,7 @@ class UserService {
         }
         const isPasswordValid = await bcrypt.compare(password, candidate.password); // checking for correct password
         if (!isPasswordValid) {
+            console.log("invalid password")
             throw ApiError.BadRequest("Invalid email or password")
         }
         return this.generateUserResponse(candidate)
@@ -88,7 +89,11 @@ class UserService {
         if (data.password) {
             data.password = await bcrypt.hash(data.password, 6);
         }
-        const updatedUser = await User.findOneAndUpdate({_id: userId}, {$set: data}, { new : true})
+        if (data.email) {
+            let user = await User.findOne({email: data.email});
+            if (user && (userId != user._id)) throw ApiError.BadRequest("Person with this email address already exists")
+        }
+        const updatedUser = await User.findOneAndUpdate({_id: userId}, {$set: data}, {new: true})
         return updatedUser
     }
 
@@ -149,12 +154,13 @@ class UserService {
         });
     }
 
-    async unFollowUser(userToFollowId, currentUserId) {
-        const userToFollow = await User.findById(userToFollowId)
+    async unFollowUser(userToUnFollowId, currentUserId) {
+        const userToUnFollow = await User.findById(userToUnFollowId)
         const currentUser = await User.findById(currentUserId)
-        if (userToFollow.followers.includes(currentUser._id)) {
-            await userToFollow.updateOne({$pull: {followers: currentUserId}, $push: {subscribedTo: currentUserId}})
-            await currentUser.updateOne({$pull: {followers: userToFollowId}, $push: {subscribers: userToFollowId}})
+        if (userToUnFollow.followers.includes(currentUser._id)) {
+            console.log(currentUserId, userToUnFollowId)
+            await User.updateOne({_id: userToUnFollowId}, {$pull: {followers: currentUserId}})
+            await User.updateOne({_id: currentUserId}, {$pull: {followers: userToUnFollowId}})
         } else {
             throw ApiError.BadRequest("You dont follow this user")
         }
@@ -174,7 +180,7 @@ class UserService {
     }
 
     async allUsers(query, userId) {
-        const isFriends = query.isFriends;
+        const isFriends = query.isFriend;
         const keyword = query.search
             ? {
                 $or: [
@@ -184,44 +190,19 @@ class UserService {
             }
             : {}
         let users;
-        if (isFriends) {
+        if (isFriends === "true") {
             users = await User
                 .find(keyword)
-                .find({_id: {$ne: userId}})
-                .find(
-                    {
-                        $or: [
-                            {
-                                followers: {$in: [userId]}
-                            },
-                            {
-                                followersRequests: {$in: [userId]}
-                            },
-                            {
-                                followingRequests: {$in: [userId]}
-                            },
-                        ]
-                    }
-                )
+                .find({
+                    $and : [
+                        {_id: {$ne: userId}},
+                        {followers : { $in : [userId] }}
+                    ]
+                })
         } else {
             users = await User
                 .find(keyword)
                 .find({_id: {$ne: userId}})
-                .find(
-                    {
-                        $and: [
-                            {
-                                followers: {$nin: [userId]}
-                            },
-                            {
-                                followersRequests: {$nin: [userId]}
-                            },
-                            {
-                                followingRequests: {$nin: [userId]}
-                            }
-                        ]
-                    }
-                )
         }
         return users
     }

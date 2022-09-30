@@ -31,7 +31,7 @@ class MessageController {
     async updateMessages(req,res,next){
         try {
             const updatedData = await messageService.updateMessage(req.body,req.params.id);
-            return res.status(200).json("Updated");
+            return res.status(200).json(updatedData);
         }catch (err){
             next(err);
         }
