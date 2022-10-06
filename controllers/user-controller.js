@@ -163,6 +163,14 @@ class UserController {
             next(err)
         }
     }
+    async addPhoto(req,res,next){
+        try {
+            await userService.addNewPhoto(req.user.id,req.body.photo)
+            return res.status(200).json(req.body)
+        }catch (err){
+            next(err)
+        }
+    }
 
 
 }

@@ -19,6 +19,9 @@ const UserSchema = new Schema({
     activated: {type: Boolean, default: false},
     activationLink: {type: String},
     profilePicture: {type: String, default: ""},
+    photos : [
+        { type : String }
+    ],
     coverPicture: {type: String, default: ""},
     posts : [
         { type : Schema.Types.ObjectId, ref : "Post"}

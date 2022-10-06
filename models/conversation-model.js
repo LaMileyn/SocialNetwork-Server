@@ -11,7 +11,6 @@ const ConversationSchema = new Schema({
     admins: [
         {type: Schema.Types.ObjectId, ref: "User"}
     ],
-    // one to one messages or group
     isGroupChat: { type : Boolean, default: false},
     lastMessage : { type : Schema.Types.ObjectId, ref : "Message"}
 }, {timestamps: true})

@@ -217,6 +217,14 @@ class UserService {
         return users;
     }
 
+    async addNewPhoto(id,photo){
+        await User.findByIdAndUpdate(id,{
+            $push : {
+                photos : photo
+            }
+        })
+    }
+
 }
 
 module.exports = new UserService();
